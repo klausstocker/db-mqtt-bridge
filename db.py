@@ -1,6 +1,5 @@
 from config import config_db
 import pymysql as mariadb
-from dictobj import DictionaryObject, MutableDictionaryObject
 import threading
 import time
 import datetime
@@ -72,7 +71,7 @@ class Db:
 
     def query(self, sql=str(), param=tuple()):
         try:
-            if sql == str() or param == tuple():
+            if not self.__connection_state and (sql == str() or param == tuple()):
                 raise
             with self.__lock:
                 cur = self.__db.cursor()

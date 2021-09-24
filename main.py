@@ -10,17 +10,30 @@ lock = threading.Lock()
 
 
 def on_message(client, userdata, msg):
-    # -------------------------------------------------
-    # doing something with message
-    # -------------------------------------------------
-    print("INCOMING Message: ", msg.topic, msg.payload)
-    id = msg.topic.split("/")[-1]
-    result = db.query(sql="SELECT name FROM makerspace.user WHERE rfid=%s", param=(id,))
-    if result == tuple():
-        print("No data for this id: " + id)
-    else:
-        print(result)
-    mqtt.publish(topic="mksp/reply/" + id, payload=str(result).encode("utf-8"), retain=False)
+    try:
+        # -------------------------------------------------
+        # doing stuff with message
+        # -------------------------------------------------
+        print("INCOMING Message: ", msg.topic, msg.payload)
+
+        # -------------------------------------------------
+        # database request
+        # -------------------------------------------------
+        id = msg.topic.split("/")[-1]
+        result = db.query(sql="SELECT name FROM makerspace.user WHERE rfid=%s", param=(id,))
+        # -------------------------------------------------
+        # handling the reply
+        # -------------------------------------------------
+        if result == tuple():
+            print("No data for this id: " + id)
+        else:
+            print(result)
+        # -------------------------------------------------
+        # send mqtt message
+        # -------------------------------------------------
+        mqtt.publish(topic="mksp/reply/" + id, payload=str(result).encode("utf-8"), retain=False)
+    except Exception as e:
+        print(e.__str__())
 
 
 mqtt.on_message = on_message
