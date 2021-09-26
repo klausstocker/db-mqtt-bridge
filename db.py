@@ -120,7 +120,7 @@ class Db:
 
         until = result[0]['until']
         if datetime.now().date() > until:
-            print('rfid %s has expired' % rfid)
+            print('rfid %s has expired' % id)
             return self._deny()
 
         restriction = result[0]['restriction']
