@@ -100,7 +100,7 @@ class Db:
         if result == tuple():
             print("No device for this address: " + address)
             return self._deny()
-        
+          
         if len(result) != 1:
             print("address (%s) is not unique, check database: " % address)
             return self._deny()
@@ -112,22 +112,23 @@ class Db:
                 rights.device_id = devices.device_id INNER JOIN userCategories ON 
                 users.userCategory = userCategories.id 
                 WHERE users.rfid = %s AND rights.device_id = %s AND devices.maintenance = 0"""
-        
+
+
         result = db.query(sql=sql, param=(id, deviceId))
-        
+
         if len(result) != 1:
             return self._deny()
-        
+
         until = result[0]['until']
         if datetime.now().date() > until:
-            print('rfid %s has expired' % rfid)
+            print('rfid %s has expired' % id)
             return self._deny()
-            
+
         restriction = result[0]['restriction']
         if not eval(restriction):
             print('rfid %s is not allowed at this time' % id)
             return self._deny()
- 
+
         return {"access": "yes", "value": int(autoOff), "unit": "s"}
 
 
@@ -135,4 +136,4 @@ if __name__ == '__main__':
     db = Db()
     print(db.checkRfid('4DAB4ED3', '192.168.234.11'))
     print(db.checkRfid('D64E381A', '192.168.234.11'))
-    
+
